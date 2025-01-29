@@ -1,6 +1,5 @@
 package cz.cervenka.p2p_project.command;
 
-import lombok.Getter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

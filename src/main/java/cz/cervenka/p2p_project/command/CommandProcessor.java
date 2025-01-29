@@ -11,9 +11,6 @@ public class CommandProcessor {
     private BankService bankService;
     private AccountService accountService;
 
-    public CommandProcessor() {
-    }
-
     public CommandProcessor(BankService bankService, AccountService accountService) {
         this.bankService = bankService;
         this.accountService = accountService;
@@ -56,12 +53,11 @@ public class CommandProcessor {
     }
 
     private String processBC() throws UnknownHostException {
-        String bankCode = InetAddress.getLocalHost().getHostAddress();
-        return "BC " + bankCode;
+        return "BC " + InetAddress.getLocalHost().getHostAddress();
     }
 
     private String processAC() {
-        int accountNumber = accountService.createAccount(bankService.getBankId());
+        int accountNumber = accountService.createAccount();
         if (accountNumber != -1) {
             return "AC " + accountNumber + "/" + bankService.getBankCode();
         }
@@ -78,16 +74,15 @@ public class CommandProcessor {
             return "ER Invalid account format.";
         }
 
-        String amount = params[1];
-        if (!CommandParser.isValidAmount(amount)) {
-            return "ER Invalid amount format.";
-        }
-
         int accountNumber = Integer.parseInt(accountParts[0]);
         String bankCode = accountParts[1];
-        double depositAmount = Double.parseDouble(amount);
+        double depositAmount = Double.parseDouble(params[1]);
 
-        if (accountService.deposit(accountNumber, bankService.getBankIdByCode(bankCode), depositAmount)) {
+        if (!bankService.isValidBankCode(bankCode)) {
+            return "ER Invalid bank code.";
+        }
+
+        if (accountService.deposit(accountNumber, depositAmount)) {
             return "AD";
         }
         return "ER Failed to deposit money.";
@@ -103,16 +98,15 @@ public class CommandProcessor {
             return "ER Invalid account format.";
         }
 
-        String amount = params[1];
-        if (!CommandParser.isValidAmount(amount)) {
-            return "ER Invalid amount format.";
-        }
-
         int accountNumber = Integer.parseInt(accountParts[0]);
         String bankCode = accountParts[1];
-        double withdrawalAmount = Double.parseDouble(amount);
+        double withdrawalAmount = Double.parseDouble(params[1]);
 
-        if (accountService.withdraw(accountNumber, bankService.getBankIdByCode(bankCode), withdrawalAmount)) {
+        if (!bankService.isValidBankCode(bankCode)) {
+            return "ER Invalid bank code.";
+        }
+
+        if (accountService.withdraw(accountNumber, withdrawalAmount)) {
             return "AW";
         }
         return "ER Insufficient funds or failed to withdraw.";
@@ -130,12 +124,13 @@ public class CommandProcessor {
 
         int accountNumber = Integer.parseInt(accountParts[0]);
         String bankCode = accountParts[1];
-        double balance = accountService.getBalance(accountNumber, bankService.getBankIdByCode(bankCode));
 
-        if (balance >= 0) {
-            return "AB " + balance;
+        if (!bankService.isValidBankCode(bankCode)) {
+            return "ER Invalid bank code.";
         }
-        return "ER Failed to retrieve balance.";
+
+        double balance = accountService.getBalance(accountNumber);
+        return balance >= 0 ? "AB " + balance : "ER Failed to retrieve balance.";
     }
 
     private String processAR(String[] params) {
@@ -151,19 +146,21 @@ public class CommandProcessor {
         int accountNumber = Integer.parseInt(accountParts[0]);
         String bankCode = accountParts[1];
 
-        if (accountService.removeAccount(accountNumber, bankService.getBankIdByCode(bankCode))) {
+        if (!bankService.isValidBankCode(bankCode)) {
+            return "ER Invalid bank code.";
+        }
+
+        if (accountService.removeAccount(accountNumber)) {
             return "AR";
         }
         return "ER Cannot delete account with non-zero balance.";
     }
 
     private String processBA() {
-        double totalAmount = bankService.getTotalFunds();
-        return "BA " + totalAmount;
+        return "BA " + bankService.getTotalFunds();
     }
 
     private String processBN() {
-        int clientCount = bankService.getClientCount();
-        return "BN " + clientCount;
+        return "BN " + bankService.getClientCount();
     }
 }

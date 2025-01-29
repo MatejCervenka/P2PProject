@@ -22,8 +22,8 @@ public class P2PServer {
             System.out.println("Server is listening on port " + port);
 
             // Initialize services
-            BankService bankService = new BankService();
             AccountService accountService = new AccountService();
+            BankService bankService = new BankService(accountService);
             CommandProcessor commandProcessor = new CommandProcessor(bankService, accountService);
 
             while (true) {

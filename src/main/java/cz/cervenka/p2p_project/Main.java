@@ -4,6 +4,7 @@ import cz.cervenka.p2p_project.config.DatabaseConfig;
 import cz.cervenka.p2p_project.server.P2PServer;
 
 public class Main {
+
     public static void main(String[] args) {
         System.out.println("Hello, World!");
 

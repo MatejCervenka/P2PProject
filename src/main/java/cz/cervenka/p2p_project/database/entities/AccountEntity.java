@@ -1,8 +1,6 @@
 package cz.cervenka.p2p_project.database.entities;
 
 import cz.cervenka.p2p_project.config.ConnectionManager;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,38 +11,51 @@ public class AccountEntity {
     private int id;
     private int accountNumber;
     private double balance;
-    private int bankId;
 
     public AccountEntity() {}
 
-    public AccountEntity(int id, int accountNumber, double balance, int bankId) {
+    public AccountEntity(int id, int accountNumber, double balance) {
         this.id = id;
         this.accountNumber = accountNumber;
         this.balance = balance;
-        this.bankId = bankId;
     }
 
     /**
      * Finds an account by account number and bank ID.
      */
-    public static AccountEntity findByAccountNumberAndBankId(int accountNumber, int bankId) throws SQLException {
-        String query = "SELECT * FROM account WHERE account_number = ? AND bank_id = ?";
+    public static AccountEntity findByAccountNumber(int accountNumber) throws SQLException {
+        String query = "SELECT * FROM account WHERE account_number = ?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, accountNumber);
-            stmt.setInt(2, bankId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new AccountEntity(
                             rs.getInt("id"),
                             rs.getInt("account_number"),
-                            rs.getDouble("balance"),
-                            rs.getInt("bank_id")
+                            rs.getDouble("balance")
                     );
                 }
             }
         }
         return null;
+    }
+
+    public static List<AccountEntity> getAll() throws SQLException {
+        List<AccountEntity> products = new ArrayList<>();
+        String sql = "SELECT * FROM account";
+        try (Connection conn = ConnectionManager.getConnection();
+             Statement statement = conn.createStatement();
+             ResultSet result = statement.executeQuery(sql)) {
+                while (result.next()) {
+                    products.add(new AccountEntity(
+                            result.getInt("id"),
+                            result.getInt("account_number"),
+                            result.getDouble("balance")
+                    ));
+                }
+            }
+        return products;
     }
 
     /**
@@ -55,11 +66,10 @@ public class AccountEntity {
         try (Connection conn = ConnectionManager.getConnection()) {
             if (this.id == 0) {
                 // Insert new account
-                query = "INSERT INTO account (account_number, balance, bank_id) VALUES (?, ?, ?)";
+                query = "INSERT INTO account (account_number, balance) VALUES (?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setInt(1, this.accountNumber);
                     stmt.setDouble(2, this.balance);
-                    stmt.setInt(3, this.bankId);
                     stmt.executeUpdate();
                     try (ResultSet rs = stmt.getGeneratedKeys()) {
                         if (rs.next()) {
@@ -121,13 +131,5 @@ public class AccountEntity {
 
     public void setBalance(double balance) {
         this.balance = balance;
-    }
-
-    public int getBankId() {
-        return bankId;
-    }
-
-    public void setBankId(int bankId) {
-        this.bankId = bankId;
     }
 }
