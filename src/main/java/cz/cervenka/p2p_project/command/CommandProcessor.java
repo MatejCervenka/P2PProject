@@ -1,10 +1,12 @@
 package cz.cervenka.p2p_project.command;
 
+import cz.cervenka.p2p_project.database.entities.AccountEntity;
 import cz.cervenka.p2p_project.services.AccountService;
 import cz.cervenka.p2p_project.services.BankService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 public class CommandProcessor {
 
@@ -44,6 +46,8 @@ public class CommandProcessor {
                     return processBA();
                 case "BN":
                     return processBN();
+                case "AS":
+                    return processAS();
                 default:
                     return "ER Unknown command.";
             }
@@ -83,7 +87,7 @@ public class CommandProcessor {
         }
 
         if (accountService.deposit(accountNumber, depositAmount)) {
-            return "AD";
+            return "AD " + accountNumber + "/" + bankService.getBankCode() + " +" + depositAmount;
         }
         return "ER Failed to deposit money.";
     }
@@ -107,7 +111,7 @@ public class CommandProcessor {
         }
 
         if (accountService.withdraw(accountNumber, withdrawalAmount)) {
-            return "AW";
+            return "AW " + accountNumber + "/" + bankService.getBankCode() + " +" + withdrawalAmount;
         }
         return "ER Insufficient funds or failed to withdraw.";
     }
@@ -162,5 +166,27 @@ public class CommandProcessor {
 
     private String processBN() {
         return "BN " + bankService.getClientCount();
+    }
+
+    private String processAS() {
+        try {
+            List<AccountEntity> accounts = accountService.getAccounts();
+
+            if (accounts.isEmpty()) {
+                return "ER No accounts available.";
+            }
+
+            StringBuilder result = new StringBuilder();
+
+            for (AccountEntity account : accounts) {
+                result.append(account.getAccountNumber())
+                        .append("/").append(bankService.getBankCode())
+                        .append(" ");
+            }
+
+            return "AS " + result.toString().trim();
+        } catch (Exception e) {
+            return "ER An error occurred while processing accounts: " + e.getMessage();
+        }
     }
 }

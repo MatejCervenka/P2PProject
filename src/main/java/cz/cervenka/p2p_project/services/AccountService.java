@@ -3,6 +3,7 @@ package cz.cervenka.p2p_project.services;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AccountService {
@@ -108,5 +109,15 @@ public class AccountService {
             e.printStackTrace();
         }
         return accountCount;
+    }
+
+    public List<AccountEntity> getAccounts() {
+        List<AccountEntity> allAccounts = new ArrayList<>();
+        try {
+            allAccounts = AccountEntity.getAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allAccounts;
     }
 }

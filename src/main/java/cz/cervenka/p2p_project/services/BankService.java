@@ -1,7 +1,11 @@
 package cz.cervenka.p2p_project.services;
 
+import cz.cervenka.p2p_project.database.entities.AccountEntity;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
+import java.util.List;
 
 public class BankService {
     private final String bankCode;
@@ -43,5 +47,9 @@ public class BankService {
      */
     public int getClientCount() {
         return accountService.getTotalAccounts();
+    }
+
+    public List<AccountEntity> getAccounts() {
+        return accountService.getAccounts();
     }
 }

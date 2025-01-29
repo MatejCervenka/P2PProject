@@ -32,7 +32,18 @@ public class CommandParser {
 
         String[] parts = rawInput.split(" ");
         String command = parts[0].toUpperCase();
-        String[] parameters = parts.length > 1 ? parts[1].split("/") : new String[0];
+        String[] parameters;
+
+        if (command.equals("AD") || command.equals("AW") || command.equals("AB") || command.equals("AR")) { // Handle AD, AW, AB and AR specially
+            if (parts.length > 1) {
+                parameters = new String[parts.length - 1];
+                System.arraycopy(parts, 1, parameters, 0, parts.length - 1); // Keep the whole account/bank code string
+            } else {
+                parameters = new String[0];
+            }
+        } else {
+            parameters = parts.length > 1 ? parts[1].split("/") : new String[0]; // Normal split for other commands
+        }
 
         return new ParsedCommand(command, parameters);
     }
