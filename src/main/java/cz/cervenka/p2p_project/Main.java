@@ -6,14 +6,13 @@ import cz.cervenka.p2p_project.server.P2PServer;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down...");
             DatabaseConfig.closeDataSource();
         }));
 
-        int port = 65525; // Specify the port here
+        int port = 65525;
         P2PServer server = new P2PServer(port);
         server.start();
     }

@@ -1,10 +1,9 @@
 package cz.cervenka.p2p_project.services;
 
+import cz.cervenka.p2p_project.config.ApplicationConfig;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.SQLException;
 import java.util.List;
 
 public class BankService {
@@ -12,7 +11,7 @@ public class BankService {
     private final AccountService accountService;
 
     public BankService(AccountService accountService) throws UnknownHostException {
-        this.bankCode = InetAddress.getLocalHost().getHostAddress();
+        this.bankCode = ApplicationConfig.getProperty("server.host.address");
         this.accountService = accountService;
     }
 
@@ -37,7 +36,7 @@ public class BankService {
      * Retrieves the total funds across all accounts.
      * @return The total balance in the system.
      */
-    public double getTotalFunds() {
+    public Long getTotalFunds() {
         return accountService.getTotalFunds();
     }
 

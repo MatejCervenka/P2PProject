@@ -12,7 +12,7 @@ public class AccountService {
         try {
             AccountEntity account = new AccountEntity();
             account.setAccountNumber(generateUniqueAccountNumber());
-            account.setBalance(0.0);
+            account.setBalance(0L);
             account.save();
             return account.getAccountNumber();
         } catch (SQLException e) {
@@ -21,7 +21,7 @@ public class AccountService {
         }
     }
 
-    public boolean deposit(int accountNumber, double amount) {
+    public boolean deposit(int accountNumber, Long amount) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
             if (account != null) {
@@ -34,7 +34,7 @@ public class AccountService {
         return false;
     }
 
-    public boolean withdraw(int accountNumber, double amount) {
+    public boolean withdraw(int accountNumber, Long amount) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
             if (account != null && account.getBalance() >= amount) {
@@ -47,7 +47,7 @@ public class AccountService {
         return false;
     }
 
-    public double getBalance(int accountNumber) {
+    public Long getBalance(int accountNumber) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
             if (account != null) {
@@ -56,13 +56,13 @@ public class AccountService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1.0;
+        return -1L;
     }
 
     public boolean removeAccount(int accountNumber) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
-            if (account != null && account.getBalance() == 0.0) {
+            if (account != null && account.getBalance() == 0) {
                 account.delete();
                 return true;
             }
@@ -81,8 +81,8 @@ public class AccountService {
      * Retrieves the total funds across all accounts.
      * @return The total balance of all accounts.
      */
-    public double getTotalFunds() {
-        double totalFunds = 0.0;
+    public Long getTotalFunds() {
+        Long totalFunds = 0L;
         try {
             // Assume you have a method that gets all accounts.
             List<AccountEntity> allAccounts = AccountEntity.getAll(); // This method would return all accounts in the database.

@@ -10,11 +10,11 @@ public class AccountEntity {
 
     private int id;
     private int accountNumber;
-    private double balance;
+    private Long balance;
 
     public AccountEntity() {}
 
-    public AccountEntity(int id, int accountNumber, double balance) {
+    public AccountEntity(int id, int accountNumber, Long balance) {
         this.id = id;
         this.accountNumber = accountNumber;
         this.balance = balance;
@@ -33,7 +33,7 @@ public class AccountEntity {
                     return new AccountEntity(
                             rs.getInt("id"),
                             rs.getInt("account_number"),
-                            rs.getDouble("balance")
+                            rs.getLong("balance")
                     );
                 }
             }
@@ -51,7 +51,7 @@ public class AccountEntity {
                     products.add(new AccountEntity(
                             result.getInt("id"),
                             result.getInt("account_number"),
-                            result.getDouble("balance")
+                            result.getLong("balance")
                     ));
                 }
             }
@@ -92,7 +92,7 @@ public class AccountEntity {
     /**
      * Updates the account balance.
      */
-    public void updateBalance(double amount) throws SQLException {
+    public void updateBalance(Long amount) throws SQLException {
         this.balance += amount;
         save();
     }
@@ -125,11 +125,11 @@ public class AccountEntity {
         this.accountNumber = accountNumber;
     }
 
-    public double getBalance() {
+    public Long getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(Long balance) {
         this.balance = balance;
     }
 }

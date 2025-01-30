@@ -1,5 +1,6 @@
 package cz.cervenka.p2p_project.command;
 
+import cz.cervenka.p2p_project.config.ConfigTimeout;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 import cz.cervenka.p2p_project.services.AccountService;
 import cz.cervenka.p2p_project.services.BankService;
@@ -7,18 +8,35 @@ import cz.cervenka.p2p_project.services.BankService;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class CommandProcessor {
 
-    private BankService bankService;
-    private AccountService accountService;
+    private final BankService bankService;
+    private final AccountService accountService;
+    private final ExecutorService executor;
+
 
     public CommandProcessor(BankService bankService, AccountService accountService) {
         this.bankService = bankService;
         this.accountService = accountService;
+        this.executor = Executors.newCachedThreadPool();
     }
 
     public String processCommand(String rawInput) {
+        Callable<String> task = () -> executeCommand(rawInput);
+        Future<String> future = executor.submit(task);
+
+        try {
+            return future.get(ConfigTimeout.getCommandTimeout(), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            return "ER Command timeout exceeded (" + ConfigTimeout.getCommandTimeout() + "ms).";
+        } catch (Exception e) {
+            return "ER An error occurred: " + e.getMessage();
+        }
+    }
+
+    private String executeCommand(String rawInput) {
         CommandParser.ParsedCommand parsedCommand = CommandParser.parse(rawInput);
 
         if (parsedCommand == null) {
@@ -80,7 +98,7 @@ public class CommandProcessor {
 
         int accountNumber = Integer.parseInt(accountParts[0]);
         String bankCode = accountParts[1];
-        double depositAmount = Double.parseDouble(params[1]);
+        Long depositAmount = Long.parseLong(params[1]);
 
         if (!bankService.isValidBankCode(bankCode)) {
             return "ER Invalid bank code.";
@@ -104,14 +122,14 @@ public class CommandProcessor {
 
         int accountNumber = Integer.parseInt(accountParts[0]);
         String bankCode = accountParts[1];
-        double withdrawalAmount = Double.parseDouble(params[1]);
+        Long withdrawalAmount = Long.parseLong(params[1]);
 
         if (!bankService.isValidBankCode(bankCode)) {
             return "ER Invalid bank code.";
         }
 
         if (accountService.withdraw(accountNumber, withdrawalAmount)) {
-            return "AW " + accountNumber + "/" + bankService.getBankCode() + " +" + withdrawalAmount;
+            return "AW " + accountNumber + "/" + bankService.getBankCode() + " -" + withdrawalAmount;
         }
         return "ER Insufficient funds or failed to withdraw.";
     }
@@ -133,7 +151,7 @@ public class CommandProcessor {
             return "ER Invalid bank code.";
         }
 
-        double balance = accountService.getBalance(accountNumber);
+        Long balance = accountService.getBalance(accountNumber);
         return balance >= 0 ? "AB " + balance : "ER Failed to retrieve balance.";
     }
 
@@ -181,7 +199,7 @@ public class CommandProcessor {
             for (AccountEntity account : accounts) {
                 result.append(account.getAccountNumber())
                         .append("/").append(bankService.getBankCode())
-                        .append(" ");
+                        .append("  ||  ");
             }
 
             return "AS " + result.toString().trim();

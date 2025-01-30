@@ -21,16 +21,15 @@ public class P2PServer {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is listening on port " + port);
 
-            // Initialize services
             AccountService accountService = new AccountService();
             BankService bankService = new BankService(accountService);
+            System.out.println("IP: " + bankService.getBankCode());
             CommandProcessor commandProcessor = new CommandProcessor(bankService, accountService);
 
             while (true) {
-                Socket clientSocket = serverSocket.accept(); // Accept an incoming connection
+                Socket clientSocket = serverSocket.accept();
                 System.out.println("New client connected: " + clientSocket.getInetAddress());
 
-                // Pass the CommandProcessor to ClientHandler
                 new Thread(new ClientHandler(clientSocket, commandProcessor)).start();
             }
 
