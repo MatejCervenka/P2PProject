@@ -44,7 +44,7 @@ public class BankService {
      * Retrieves the number of accounts (clients).
      * @return The number of accounts in the system.
      */
-    public int getClientCount() {
+    public Long getClientCount() {
         return accountService.getTotalAccounts();
     }
 

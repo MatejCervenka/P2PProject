@@ -2,6 +2,7 @@ package cz.cervenka.p2p_project.command;
 
 import cz.cervenka.p2p_project.config.ConfigTimeout;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
+import cz.cervenka.p2p_project.network.NetworkClient;
 import cz.cervenka.p2p_project.services.AccountService;
 import cz.cervenka.p2p_project.services.BankService;
 
@@ -47,28 +48,18 @@ public class CommandProcessor {
         String[] params = parsedCommand.getParameters();
 
         try {
-            switch (command) {
-                case "BC":
-                    return processBC();
-                case "AC":
-                    return processAC();
-                case "AD":
-                    return processAD(params);
-                case "AW":
-                    return processAW(params);
-                case "AB":
-                    return processAB(params);
-                case "AR":
-                    return processAR(params);
-                case "BA":
-                    return processBA();
-                case "BN":
-                    return processBN();
-                case "AS":
-                    return processAS();
-                default:
-                    return "ER Unknown command.";
-            }
+            return switch (command) {
+                case "BC" -> processBC();
+                case "AC" -> processAC();
+                case "AD" -> processAD(params);
+                case "AW" -> processAW(params);
+                case "AB" -> processAB(params);
+                case "AR" -> processAR(params);
+                case "BA" -> processBA();
+                case "BN" -> processBN();
+                case "AS" -> processAS();
+                default -> "ER Unknown command.";
+            };
         } catch (Exception e) {
             return "ER An error occurred: " + e.getMessage();
         }
@@ -92,7 +83,7 @@ public class CommandProcessor {
         }
 
         String[] accountParts = params[0].split("/");
-        if (accountParts.length != 2 || !CommandParser.isValidAccountNumber(accountParts[0]) || !CommandParser.isValidBankCode(accountParts[1])) {
+        if (accountParts.length != 2) {
             return "ER Invalid account format.";
         }
 
@@ -101,13 +92,13 @@ public class CommandProcessor {
         Long depositAmount = Long.parseLong(params[1]);
 
         if (!bankService.isValidBankCode(bankCode)) {
-            return "ER Invalid bank code.";
+            // Forward to another bank node
+            return NetworkClient.sendCommand(bankCode, 65525, "AD " + accountNumber + "/" + bankCode + " " + depositAmount);
         }
 
-        if (accountService.deposit(accountNumber, depositAmount)) {
-            return "AD " + accountNumber + "/" + bankService.getBankCode() + " +" + depositAmount;
-        }
-        return "ER Failed to deposit money.";
+        return accountService.deposit(accountNumber, depositAmount) ?
+                "AD " + accountNumber + "/" + bankService.getBankCode() + " +" + depositAmount :
+                "ER Failed to deposit money.";
     }
 
     private String processAW(String[] params) {
@@ -116,7 +107,7 @@ public class CommandProcessor {
         }
 
         String[] accountParts = params[0].split("/");
-        if (accountParts.length != 2 || !CommandParser.isValidAccountNumber(accountParts[0]) || !CommandParser.isValidBankCode(accountParts[1])) {
+        if (accountParts.length != 2) {
             return "ER Invalid account format.";
         }
 
@@ -125,13 +116,13 @@ public class CommandProcessor {
         Long withdrawalAmount = Long.parseLong(params[1]);
 
         if (!bankService.isValidBankCode(bankCode)) {
-            return "ER Invalid bank code.";
+            // Forward to another bank node
+            return NetworkClient.sendCommand(bankCode, 65525, "AW " + accountNumber + "/" + bankCode + " " + withdrawalAmount);
         }
 
-        if (accountService.withdraw(accountNumber, withdrawalAmount)) {
-            return "AW " + accountNumber + "/" + bankService.getBankCode() + " -" + withdrawalAmount;
-        }
-        return "ER Insufficient funds or failed to withdraw.";
+        return accountService.withdraw(accountNumber, withdrawalAmount) ?
+                "AW " + accountNumber + "/" + bankService.getBankCode() + " -" + withdrawalAmount :
+                "ER Insufficient funds or failed to withdraw.";
     }
 
     private String processAB(String[] params) {
@@ -140,7 +131,7 @@ public class CommandProcessor {
         }
 
         String[] accountParts = params[0].split("/");
-        if (accountParts.length != 2 || !CommandParser.isValidAccountNumber(accountParts[0]) || !CommandParser.isValidBankCode(accountParts[1])) {
+        if (accountParts.length != 2) {
             return "ER Invalid account format.";
         }
 
@@ -148,10 +139,11 @@ public class CommandProcessor {
         String bankCode = accountParts[1];
 
         if (!bankService.isValidBankCode(bankCode)) {
-            return "ER Invalid bank code.";
+            // Forward to another bank node
+            return NetworkClient.sendCommand(bankCode, 65525, "AB " + accountNumber + "/" + bankCode);
         }
 
-        Long balance = accountService.getBalance(accountNumber);
+        double balance = accountService.getBalance(accountNumber);
         return balance >= 0 ? "AB " + balance : "ER Failed to retrieve balance.";
     }
 

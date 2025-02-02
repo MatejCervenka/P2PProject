@@ -17,7 +17,7 @@ public class AccountService {
             return account.getAccountNumber();
         } catch (SQLException e) {
             e.printStackTrace();
-            return -1; // Error code for failure
+            return -1;
         }
     }
 
@@ -99,8 +99,8 @@ public class AccountService {
      * Retrieves the total number of accounts in the system.
      * @return The number of accounts.
      */
-    public int getTotalAccounts() {
-        int accountCount = 0;
+    public Long getTotalAccounts() {
+        long accountCount = 0L;
         try {
             // Assume you have a method that gets all accounts.
             List<AccountEntity> allAccounts = AccountEntity.getAll(); // This method would return all accounts in the database.
