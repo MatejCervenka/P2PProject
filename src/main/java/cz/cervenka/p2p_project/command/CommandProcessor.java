@@ -145,7 +145,7 @@ public class CommandProcessor {
             return NetworkClient.sendCommand(bankCode, PORT, "AB " + accountNumber + "/" + bankCode);
         }
 
-        double balance = accountService.getBalance(accountNumber);
+        Long balance = accountService.getBalance(accountNumber);
         return balance >= 0 ? "AB " + balance : "ER Failed to retrieve balance.";
     }
 
