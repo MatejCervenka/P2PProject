@@ -5,18 +5,27 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ApplicationConfig {
+
     private static final String CONFIG_FILE = "src/main/resources/application.properties";
     private static final Properties properties = new Properties();
 
     static {
-        try (FileInputStream input = new FileInputStream(CONFIG_FILE)) {
-            properties.load(input);
+        try (FileInputStream fis = new FileInputStream(CONFIG_FILE)) {
+            properties.load(fis);
         } catch (IOException e) {
-            System.err.println("Error loading configuration: " + e.getMessage());
+            throw new RuntimeException("Failed to load application.properties: " + e.getMessage());
         }
     }
 
-    public static String getProperty(String key) {
-        return properties.getProperty(key);
+    public static String get(String key) {
+        return properties.getProperty(key, "").trim();
+    }
+
+    public static int getInt(String key) {
+        String value = properties.getProperty(key);
+        if (value == null) {
+            throw new RuntimeException("Missing configuration key: " + key);
+        }
+        return Integer.parseInt(value.trim());
     }
 }

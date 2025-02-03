@@ -12,8 +12,7 @@ public class Main {
             DatabaseConfig.closeDataSource();
         }));
 
-        int port = 65525;
-        P2PServer server = new P2PServer(port);
+        P2PServer server = new P2PServer();
         server.start();
     }
 }

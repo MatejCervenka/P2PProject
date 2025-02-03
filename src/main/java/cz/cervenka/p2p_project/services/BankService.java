@@ -11,7 +11,7 @@ public class BankService {
     private final AccountService accountService;
 
     public BankService(AccountService accountService) throws UnknownHostException {
-        this.bankCode = ApplicationConfig.getProperty("server.host.address");
+        this.bankCode = ApplicationConfig.get("server.host.address");
         this.accountService = accountService;
     }
 
