@@ -1,5 +1,6 @@
 package cz.cervenka.p2p_project.command;
 
+import cz.cervenka.p2p_project.config.ApplicationConfig;
 import cz.cervenka.p2p_project.config.ConfigTimeout;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 import cz.cervenka.p2p_project.network.NetworkClient;
@@ -16,6 +17,7 @@ public class CommandProcessor {
     private final BankService bankService;
     private final AccountService accountService;
     private final ExecutorService executor;
+    private static final int PORT = ApplicationConfig.getInt("server.port");
 
 
     public CommandProcessor(BankService bankService, AccountService accountService) {
@@ -93,7 +95,7 @@ public class CommandProcessor {
 
         if (!bankService.isValidBankCode(bankCode)) {
             // Forward to another bank node
-            return NetworkClient.sendCommand(bankCode, 65525, "AD " + accountNumber + "/" + bankCode + " " + depositAmount);
+            return NetworkClient.sendCommand(bankCode, PORT, "AD " + accountNumber + "/" + bankCode + " " + depositAmount);
         }
 
         return accountService.deposit(accountNumber, depositAmount) ?
@@ -117,7 +119,7 @@ public class CommandProcessor {
 
         if (!bankService.isValidBankCode(bankCode)) {
             // Forward to another bank node
-            return NetworkClient.sendCommand(bankCode, 65525, "AW " + accountNumber + "/" + bankCode + " " + withdrawalAmount);
+            return NetworkClient.sendCommand(bankCode, PORT, "AW " + accountNumber + "/" + bankCode + " " + withdrawalAmount);
         }
 
         return accountService.withdraw(accountNumber, withdrawalAmount) ?
@@ -140,7 +142,7 @@ public class CommandProcessor {
 
         if (!bankService.isValidBankCode(bankCode)) {
             // Forward to another bank node
-            return NetworkClient.sendCommand(bankCode, 65525, "AB " + accountNumber + "/" + bankCode);
+            return NetworkClient.sendCommand(bankCode, PORT, "AB " + accountNumber + "/" + bankCode);
         }
 
         double balance = accountService.getBalance(accountNumber);

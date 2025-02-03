@@ -6,6 +6,7 @@ import cz.cervenka.p2p_project.services.AccountService;
 import cz.cervenka.p2p_project.services.BankService;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
@@ -30,7 +31,8 @@ public class P2PServer {
     public void start() {
         System.out.println("P2P Banking Server is starting...");
 
-        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT, 50, InetAddress.getByName("0.0.0.0"));
+        ) {
             System.out.println("Server is listening on port " + PORT);
 
             AccountService accountService = new AccountService();
@@ -66,9 +68,5 @@ public class P2PServer {
             threadPool.shutdownNow();
         }
         System.out.println("Server shut down.");
-    }
-
-    public static void main(String[] args) {
-        new P2PServer().start();
     }
 }
