@@ -5,6 +5,9 @@ import java.net.Socket;
 
 public class NetworkClient {
 
+    private static final int START_PORT = 65525;
+    private static final int END_PORT = 65535;
+
     public static String sendCommand(String bankIp, int port, String command) {
         try (Socket socket = new Socket(bankIp, port);
              PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);

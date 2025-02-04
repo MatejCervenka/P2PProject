@@ -1,6 +1,7 @@
 package cz.cervenka.p2p_project.server;
 
 import cz.cervenka.p2p_project.command.CommandProcessor;
+import cz.cervenka.p2p_project.command.CommandFactory;
 import cz.cervenka.p2p_project.config.ApplicationConfig;
 import cz.cervenka.p2p_project.services.AccountService;
 import cz.cervenka.p2p_project.services.BankService;
@@ -31,20 +32,24 @@ public class P2PServer {
     public void start() {
         System.out.println("P2P Banking Server is starting...");
 
-        try (ServerSocket serverSocket = new ServerSocket(PORT, 50, InetAddress.getByName("0.0.0.0"));
-        ) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT, 50, InetAddress.getByName("0.0.0.0"))) {
             System.out.println("Server is listening on port " + PORT);
 
+            // Initialize services
             AccountService accountService = new AccountService();
             BankService bankService = new BankService(accountService);
             System.out.println("IP: " + bankService.getBankCode());
-            CommandProcessor commandProcessor = new CommandProcessor(bankService, accountService);
+
+            // CommandFactory should be passed to CommandProcessor
+            CommandFactory commandFactory = new CommandFactory(bankService, accountService);
+            CommandProcessor commandProcessor = new CommandProcessor(commandFactory);
 
             while (true) {
                 try {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("New client connected: " + clientSocket.getInetAddress());
 
+                    // Execute ClientHandler tasks with thread pool
                     threadPool.execute(new ClientHandler(clientSocket, commandProcessor));
                 } catch (IOException e) {
                     System.err.println("Error accepting client connection: " + e.getMessage());
