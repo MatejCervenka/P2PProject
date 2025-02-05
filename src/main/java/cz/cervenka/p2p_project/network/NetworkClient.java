@@ -11,33 +11,37 @@ public class NetworkClient {
 
     private static final int START_PORT = 65525;
     private static final int END_PORT = 65535;
-    private static final int CONNECTION_TIMEOUT_MS = 2000;
+    private static final int CONNECTION_TIMEOUT_MS = 20000000;
 
     public static String sendCommand(String bankIp, String command) {
         ExecutorService executor = Executors.newCachedThreadPool();
-        List<Callable<String>> tasks = new ArrayList<>();
+        List<Future<String>> results = new ArrayList<>();
 
+        // Submit connection attempts to all ports in parallel
         for (int port = START_PORT; port <= END_PORT; port++) {
             int finalPort = port;
-            tasks.add(() -> tryConnect(bankIp, finalPort, command));
+            results.add(executor.submit(() -> tryConnect(bankIp, finalPort, command)));
         }
 
         try {
-            List<Future<String>> results = executor.invokeAll(tasks);
-
             for (Future<String> result : results) {
-                if (result.isDone()) {
-                    return result.get();
+                try {
+                    String response = result.get();
+                    if (!response.startsWith("ER")) {
+                        executor.shutdownNow();
+                        return response;
+                    }
+                } catch (Exception e) {
+                    // Ignore failed attempts and continue checking other ports
                 }
             }
-        } catch (InterruptedException | ExecutionException e) {
-            return "ER Error connecting to banks: " + e.getMessage();
         } finally {
             executor.shutdown();
         }
 
         return "ER Unable to connect to any port for bank " + bankIp;
     }
+
 
     private static String tryConnect(String bankIp, int port, String command) {
         try (Socket socket = new Socket()) {
