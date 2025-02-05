@@ -1,9 +1,8 @@
 package cz.cervenka.p2p_project.command;
 
 import cz.cervenka.p2p_project.config.ConfigTimeout;
-import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.services.BankService;
 
+import java.io.IOException;
 import java.util.concurrent.*;
 
 public class CommandProcessor {
@@ -28,7 +27,7 @@ public class CommandProcessor {
         }
     }
 
-    private String executeCommand(String rawInput) {
+    private String executeCommand(String rawInput) throws IOException {
         CommandParser.ParsedCommand parsedCommand = CommandParser.parse(rawInput);
 
         if (parsedCommand == null) {

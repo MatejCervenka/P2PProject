@@ -1,22 +1,22 @@
 package cz.cervenka.p2p_project.command;
 
 import cz.cervenka.p2p_project.network.NetworkClient;
+import cz.cervenka.p2p_project.server.P2PServer;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.services.BankService;
 import cz.cervenka.p2p_project.config.ApplicationConfig;
+
+import java.io.IOException;
 
 public class AWCommand implements Command {
     private final AccountService accountService;
-    private final BankService bankService;
     private static final int PORT = ApplicationConfig.getInt("server.port");
 
-    public AWCommand(AccountService accountService, BankService bankService) {
+    public AWCommand(AccountService accountService) {
         this.accountService = accountService;
-        this.bankService = bankService;
     }
 
     @Override
-    public String execute(String[] parameters) {
+    public String execute(String[] parameters) throws IOException {
         if (parameters.length < 2) {
             return "ER Invalid format. Expected: AW <accountNumber>/<bankCode> <amount>";
         }
@@ -30,12 +30,12 @@ public class AWCommand implements Command {
         String bankCode = accountParts[1];
         long withdrawalAmount = Long.parseLong(parameters[1]);
 
-        if (!bankService.isValidBankCode(bankCode)) {
-            return NetworkClient.sendCommand(bankCode, PORT, "AW " + accountNumber + "/" + bankCode + " " + withdrawalAmount);
+        if (!P2PServer.isValidBankCode(bankCode)) {
+            return NetworkClient.sendCommand(bankCode, "AW " + accountNumber + "/" + bankCode + " " + withdrawalAmount);
         }
 
         return accountService.withdraw(accountNumber, withdrawalAmount)
-                ? "AW " + accountNumber + "/" + bankService.getBankCode() + " -" + withdrawalAmount
+                ? "AW " + accountNumber + "/" + P2PServer.getBankCode() + " -" + withdrawalAmount
                 : "ER Insufficient funds or invalid withdrawal.";
     }
 }

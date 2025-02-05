@@ -1,22 +1,22 @@
 package cz.cervenka.p2p_project.command;
 
+import cz.cervenka.p2p_project.server.P2PServer;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.services.BankService;
+
+import java.io.IOException;
 
 public class ACCommand implements Command {
     private final AccountService accountService;
-    private final BankService bankService;
 
-    public ACCommand(AccountService accountService, BankService bankService) {
+    public ACCommand(AccountService accountService) {
         this.accountService = accountService;
-        this.bankService = bankService;
     }
 
     @Override
-    public String execute(String[] parameters) {
+    public String execute(String[] parameters) throws IOException {
         int accountNumber = accountService.createAccount();
         return (accountNumber != -1)
-                ? "AC " + accountNumber + "/" + bankService.getBankCode()
+                ? "AC " + accountNumber + "/" + P2PServer.getBankCode()
                 : "ER Unable to create a new account.";
     }
 }

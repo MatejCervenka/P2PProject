@@ -1,18 +1,18 @@
 package cz.cervenka.p2p_project.command;
 
-import cz.cervenka.p2p_project.services.BankService;
+import cz.cervenka.p2p_project.services.AccountService;
 
 public class BNCommand implements Command {
 
-    private final BankService bankService;
+    private final AccountService accountService;
 
-    public BNCommand(BankService bankService) {
-        this.bankService = bankService;
+    public BNCommand(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @Override
     public String execute(String[] parameters) {
-        long clientCount = bankService.getClientCount();
+        long clientCount = accountService.getTotalAccounts();
         return "BN " + clientCount;
     }
 }

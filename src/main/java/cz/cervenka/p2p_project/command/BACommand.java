@@ -1,17 +1,17 @@
 package cz.cervenka.p2p_project.command;
 
-import cz.cervenka.p2p_project.services.BankService;
+import cz.cervenka.p2p_project.services.AccountService;
 
 public class BACommand implements Command {
-    private final BankService bankService;
+    private final AccountService accountService;
 
-    public BACommand(BankService bankService) {
-        this.bankService = bankService;
+    public BACommand(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @Override
     public String execute(String[] parameters) {
-        long totalFunds = bankService.getTotalFunds();
+        long totalFunds = accountService.getTotalFunds();
         return "BA " + totalFunds;
     }
 }

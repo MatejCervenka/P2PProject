@@ -1,26 +1,61 @@
 package cz.cervenka.p2p_project.network;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 public class NetworkClient {
 
     private static final int START_PORT = 65525;
     private static final int END_PORT = 65535;
+    private static final int CONNECTION_TIMEOUT_MS = 2000;
 
-    public static String sendCommand(String bankIp, int port, String command) {
-        try (Socket socket = new Socket(bankIp, port);
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+    public static String sendCommand(String bankIp, String command) {
+        ExecutorService executor = Executors.newCachedThreadPool();
+        List<Callable<String>> tasks = new ArrayList<>();
+
+        for (int port = START_PORT; port <= END_PORT; port++) {
+            int finalPort = port;
+            tasks.add(() -> tryConnect(bankIp, finalPort, command));
+        }
+
+        try {
+            List<Future<String>> results = executor.invokeAll(tasks);
+
+            for (Future<String> result : results) {
+                if (result.isDone()) {
+                    return result.get();
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            return "ER Error connecting to banks: " + e.getMessage();
+        } finally {
+            executor.shutdown();
+        }
+
+        return "ER Unable to connect to any port for bank " + bankIp;
+    }
+
+    private static String tryConnect(String bankIp, int port, String command) {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(bankIp, port), CONNECTION_TIMEOUT_MS);
+            return sendCommandToBank(socket, command);
+        } catch (IOException e) {
+            return "ER Unable to reach bank at " + bankIp + ":" + port;
+        }
+    }
+
+    private static String sendCommandToBank(Socket socket, String command) {
+        try (PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            // Send command
             writer.println(command);
-
-            // Read response
             return reader.readLine();
-
         } catch (IOException e) {
-            return "ER Unable to reach bank node at " + bankIp;
+            return "ER Error while communicating with bank.";
         }
     }
 }

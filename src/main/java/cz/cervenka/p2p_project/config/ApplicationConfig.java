@@ -2,6 +2,7 @@ package cz.cervenka.p2p_project.config;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Properties;
 
 public class ApplicationConfig {
@@ -27,5 +28,9 @@ public class ApplicationConfig {
             throw new RuntimeException("Missing configuration key: " + key);
         }
         return Integer.parseInt(value.trim());
+    }
+
+    public static void setIP(String ip) {
+        properties.setProperty("server.host.address", ip);
     }
 }

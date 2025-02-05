@@ -1,18 +1,16 @@
 package cz.cervenka.p2p_project.command;
 
+import cz.cervenka.p2p_project.server.P2PServer;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.services.BankService;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 
 import java.util.List;
 
 public class ASCommand implements Command {
     private final AccountService accountService;
-    private final BankService bankService;
 
-    public ASCommand(AccountService accountService, BankService bankService) {
+    public ASCommand(AccountService accountService) {
         this.accountService = accountService;
-        this.bankService = bankService;
     }
 
     @Override
@@ -28,7 +26,7 @@ public class ASCommand implements Command {
 
             for (AccountEntity account : accounts) {
                 result.append(account.getAccountNumber())
-                        .append("/").append(bankService.getBankCode())
+                        .append("/").append(P2PServer.getBankCode())
                         .append(" || ");
             }
 

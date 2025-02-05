@@ -4,7 +4,6 @@ import cz.cervenka.p2p_project.command.CommandProcessor;
 import cz.cervenka.p2p_project.command.CommandFactory;
 import cz.cervenka.p2p_project.config.ApplicationConfig;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.services.BankService;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -29,19 +28,19 @@ public class P2PServer {
         );
     }
 
-    public void start() {
+    public void start() throws IOException {
         System.out.println("P2P Banking Server is starting...");
+        InetAddress localAddress = getLocalIpAddress();
 
-        try (ServerSocket serverSocket = new ServerSocket(PORT, 50, InetAddress.getByName("0.0.0.0"))) {
+        try (ServerSocket serverSocket = new ServerSocket(PORT, 50, localAddress)) {
             System.out.println("Server is listening on port " + PORT);
 
             // Initialize services
             AccountService accountService = new AccountService();
-            BankService bankService = new BankService(accountService);
-            System.out.println("IP: " + bankService.getBankCode());
+            System.out.println("IP: " + getBankCode());
 
             // CommandFactory should be passed to CommandProcessor
-            CommandFactory commandFactory = new CommandFactory(bankService, accountService);
+            CommandFactory commandFactory = new CommandFactory(accountService);
             CommandProcessor commandProcessor = new CommandProcessor(commandFactory);
 
             while (true) {
@@ -73,5 +72,44 @@ public class P2PServer {
             threadPool.shutdownNow();
         }
         System.out.println("Server shut down.");
+    }
+
+    /**
+     * Gets the local LAN IP address of the machine.
+     *
+     * @return The LAN IP address or null if it cannot be determined.
+     * @throws IOException If there's an error retrieving the LAN IP address.
+     */
+    private static InetAddress getLocalIpAddress() throws IOException {
+        InetAddress localAddress = null;
+
+        // Attempt to get the LAN IP address (skipping localhost)
+        for (InetAddress address : InetAddress.getAllByName(InetAddress.getLocalHost().getHostName())) {
+            if (address.isSiteLocalAddress()) {
+                localAddress = address;
+                ApplicationConfig.setIP(String.valueOf(localAddress.getHostAddress()));
+                break;
+            }
+        }
+        return localAddress;
+    }
+
+    /**
+     * Retrieves the current bank's code (IP address).
+     *
+     * @return the bank code.
+     */
+    public static String getBankCode() throws IOException {
+        return String.valueOf(getLocalIpAddress().getHostAddress());
+    }
+
+    /**
+     * Checks if the given bank code matches this bank.
+     *
+     * @param bankCode the bank's code (IP address).
+     * @return true if it matches, false otherwise.
+     */
+    public static boolean isValidBankCode(String bankCode) throws IOException {
+        return getBankCode().equals(bankCode);
     }
 }
