@@ -22,6 +22,8 @@ public class AccountEntity {
 
     /**
      * Finds an account by account number and bank ID.
+     * @param accountNumber Number account is being found by.
+     * @return Found account
      */
     public static AccountEntity findByAccountNumber(int accountNumber) throws SQLException {
         String query = "SELECT * FROM account WHERE account_number = ?";
@@ -40,7 +42,10 @@ public class AccountEntity {
         }
         return null;
     }
-
+    /**
+     * Retrieves all accounts in database.
+     * @return All valid accounts.
+     */
     public static List<AccountEntity> getAll() throws SQLException {
         List<AccountEntity> products = new ArrayList<>();
         String sql = "SELECT * FROM account";
@@ -78,7 +83,6 @@ public class AccountEntity {
                     }
                 }
             } else {
-                // Update existing account
                 query = "UPDATE account SET balance = ? WHERE id = ?";
                 try (PreparedStatement stmt = conn.prepareStatement(query)) {
                     stmt.setDouble(1, this.balance);

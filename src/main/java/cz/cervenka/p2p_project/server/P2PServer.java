@@ -35,11 +35,9 @@ public class P2PServer {
         try (ServerSocket serverSocket = new ServerSocket(PORT, 50, localAddress)) {
             System.out.println("Server is listening on port " + PORT);
 
-            // Initialize services
             AccountService accountService = new AccountService();
             System.out.println("IP: " + getBankCode());
 
-            // CommandFactory should be passed to CommandProcessor
             CommandFactory commandFactory = new CommandFactory(accountService);
             CommandProcessor commandProcessor = new CommandProcessor(commandFactory);
 

@@ -6,8 +6,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class including methods operating with database system.
+ */
 public class AccountService {
 
+    /**
+     * Creates account in bank.
+     * @return Byte value whether account was created or not.
+     */
     public int createAccount() {
         try {
             AccountEntity account = new AccountEntity();
@@ -21,6 +28,12 @@ public class AccountService {
         }
     }
 
+    /**
+     * Deposits given amount of money into specific account.
+     * @param accountNumber Account where money is being deposited to.
+     * @param amount Amount of money being deposited.
+     * @return Byte value whether money was deposited or not.
+     */
     public boolean deposit(int accountNumber, Long amount) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
@@ -34,6 +47,12 @@ public class AccountService {
         return false;
     }
 
+    /**
+     * Withdraws given amount of money from specific account.
+     * @param accountNumber Account where money is being withdrawn from.
+     * @param amount Amount of money being withdrawn.
+     * @return Byte value whether money was withdrawn or not.
+     */
     public boolean withdraw(int accountNumber, Long amount) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
@@ -47,6 +66,11 @@ public class AccountService {
         return false;
     }
 
+    /**
+     * Retrieves a total balance of specific account.
+     * @param accountNumber Account from which balance is getting retrieved.
+     * @return Balance of specific account.
+     */
     public Long getBalance(int accountNumber) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
@@ -59,6 +83,11 @@ public class AccountService {
         return -1L;
     }
 
+    /**
+     * Removes account from bank.
+     * @param accountNumber Account which is being removed.
+     * @return Byte value whether account was removed or not.
+     */
     public boolean removeAccount(int accountNumber) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
@@ -72,8 +101,11 @@ public class AccountService {
         return false;
     }
 
+    /**
+     * Generates a random 5-digit number representing number of account.
+     * @return Random 5-digit number.
+     */
     private int generateUniqueAccountNumber() {
-        // Generate a random 5-digit unique account number.
         return (int) (Math.random() * 90000) + 10000;
     }
 
@@ -84,8 +116,7 @@ public class AccountService {
     public Long getTotalFunds() {
         Long totalFunds = 0L;
         try {
-            // Assume you have a method that gets all accounts.
-            List<AccountEntity> allAccounts = AccountEntity.getAll(); // This method would return all accounts in the database.
+            List<AccountEntity> allAccounts = AccountEntity.getAll();
             for (AccountEntity account : allAccounts) {
                 totalFunds += account.getBalance();
             }
@@ -102,8 +133,7 @@ public class AccountService {
     public Long getTotalAccounts() {
         long accountCount = 0L;
         try {
-            // Assume you have a method that gets all accounts.
-            List<AccountEntity> allAccounts = AccountEntity.getAll(); // This method would return all accounts in the database.
+            List<AccountEntity> allAccounts = AccountEntity.getAll();
             accountCount = allAccounts.size();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -111,6 +141,10 @@ public class AccountService {
         return accountCount;
     }
 
+    /**
+     * Retrieves all accounts in the system.
+     * @return The list of accounts.
+     */
     public List<AccountEntity> getAccounts() {
         List<AccountEntity> allAccounts = new ArrayList<>();
         try {
