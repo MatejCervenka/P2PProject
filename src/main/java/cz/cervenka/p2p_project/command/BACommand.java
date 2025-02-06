@@ -12,6 +12,9 @@ public class BACommand implements Command {
     @Override
     public String execute(String[] parameters) {
         try {
+            if (parameters.length > 0) {
+                return "ER Invalid format.";
+            }
             long totalFunds = accountService.getTotalFunds();
             return "BA " + totalFunds;
         } catch (Exception e) {

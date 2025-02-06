@@ -15,7 +15,14 @@ public class CommandProcessor {
     }
 
     public String processCommand(String rawInput) {
-        Callable<String> task = () -> executeCommand(rawInput);
+        rawInput = rawInput.trim();
+
+        if (rawInput.isEmpty()) {
+            return "";
+        }
+
+        String finalRawInput = rawInput;
+        Callable<String> task = () -> executeCommand(finalRawInput);
         Future<String> future = executor.submit(task);
 
         try {

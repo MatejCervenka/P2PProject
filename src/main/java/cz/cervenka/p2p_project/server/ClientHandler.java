@@ -36,6 +36,10 @@ public class ClientHandler implements Runnable {
                 String clientMessage;
 
                 while ((clientMessage = readWithTimeout(reader)) != null) {
+                    if (clientMessage.isEmpty()) {
+                        continue;
+                    }
+
                     System.out.println("Received: " + clientMessage);
 
                     String response = processWithTimeout(clientMessage);

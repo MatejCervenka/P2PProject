@@ -16,6 +16,10 @@ public class ASCommand implements Command {
     @Override
     public String execute(String[] parameters) {
         try {
+            if (parameters.length > 0) {
+                return "ER Invalid format.";
+            }
+
             List<AccountEntity> accounts = accountService.getAccounts();
 
             if (accounts.isEmpty()) {

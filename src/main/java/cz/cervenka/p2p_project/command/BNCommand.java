@@ -13,6 +13,9 @@ public class BNCommand implements Command {
     @Override
     public String execute(String[] parameters) {
         try {
+            if (parameters.length > 0) {
+                return "ER Invalid format.";
+            }
             long clientCount = accountService.getTotalAccounts();
             return "BN " + clientCount;
         } catch (Exception e) {
