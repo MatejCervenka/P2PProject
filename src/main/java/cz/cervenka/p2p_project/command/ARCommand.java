@@ -28,7 +28,7 @@ public class ARCommand implements Command {
         String bankCode = accountParts[1];
 
         if (!P2PServer.isValidBankCode(bankCode)) {
-            return NetworkClient.sendCommand(bankCode, "AR " + accountNumber + "/" + bankCode);
+            return "ER Invalid bank code.";
         }
 
         return accountService.removeAccount(accountNumber)
