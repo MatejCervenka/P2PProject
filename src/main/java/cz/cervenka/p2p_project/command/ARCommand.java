@@ -3,13 +3,11 @@ package cz.cervenka.p2p_project.command;
 import cz.cervenka.p2p_project.network.NetworkClient;
 import cz.cervenka.p2p_project.server.P2PServer;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.config.ApplicationConfig;
 
 import java.io.IOException;
 
 public class ARCommand implements Command {
     private final AccountService accountService;
-    private static final int PORT = ApplicationConfig.getInt("server.port");
 
     public ARCommand(AccountService accountService) {
         this.accountService = accountService;
@@ -34,7 +32,10 @@ public class ARCommand implements Command {
         }
 
         return accountService.removeAccount(accountNumber)
+                ? "AR" : "ER Cannot remove account (not found or nonzero balance).";
+
+        /*return accountService.removeAccount(accountNumber)
                 ? "AR " + accountNumber + "/" + P2PServer.getBankCode() + " Removed"
-                : "ER Cannot remove account (not found or nonzero balance).";
+                : "ER Cannot remove account (not found or nonzero balance).";*/
     }
 }

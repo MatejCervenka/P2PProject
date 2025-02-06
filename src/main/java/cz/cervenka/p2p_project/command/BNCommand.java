@@ -12,7 +12,11 @@ public class BNCommand implements Command {
 
     @Override
     public String execute(String[] parameters) {
-        long clientCount = accountService.getTotalAccounts();
-        return "BN " + clientCount;
+        try {
+            long clientCount = accountService.getTotalAccounts();
+            return "BN " + clientCount;
+        } catch (Exception e) {
+            return "ER Unable to retrieve client count.";
+        }
     }
 }

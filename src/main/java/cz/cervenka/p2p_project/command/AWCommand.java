@@ -3,13 +3,11 @@ package cz.cervenka.p2p_project.command;
 import cz.cervenka.p2p_project.network.NetworkClient;
 import cz.cervenka.p2p_project.server.P2PServer;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.config.ApplicationConfig;
 
 import java.io.IOException;
 
 public class AWCommand implements Command {
     private final AccountService accountService;
-    private static final int PORT = ApplicationConfig.getInt("server.port");
 
     public AWCommand(AccountService accountService) {
         this.accountService = accountService;
@@ -35,7 +33,10 @@ public class AWCommand implements Command {
         }
 
         return accountService.withdraw(accountNumber, withdrawalAmount)
+                ? "AW" : "ER Insufficient funds or invalid withdrawal.";
+
+        /*return accountService.withdraw(accountNumber, withdrawalAmount)
                 ? "AW " + accountNumber + "/" + P2PServer.getBankCode() + " -" + withdrawalAmount
-                : "ER Insufficient funds or invalid withdrawal.";
+                : "ER Insufficient funds or invalid withdrawal.";*/
     }
 }

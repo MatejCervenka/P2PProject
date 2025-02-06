@@ -16,8 +16,7 @@ public class NetworkClient {
     public static String sendCommand(String bankIp, String command) {
         ExecutorService executor = Executors.newCachedThreadPool();
         List<Future<String>> results = new ArrayList<>();
-
-        // Submit connection attempts to all ports in parallel
+        
         for (int port = START_PORT; port <= END_PORT; port++) {
             int finalPort = port;
             results.add(executor.submit(() -> tryConnect(bankIp, finalPort, command)));
@@ -41,7 +40,6 @@ public class NetworkClient {
 
         return "ER Unable to connect to any port for bank " + bankIp;
     }
-
 
     private static String tryConnect(String bankIp, int port, String command) {
         try (Socket socket = new Socket()) {

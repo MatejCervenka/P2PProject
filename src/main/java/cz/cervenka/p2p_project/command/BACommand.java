@@ -11,7 +11,11 @@ public class BACommand implements Command {
 
     @Override
     public String execute(String[] parameters) {
-        long totalFunds = accountService.getTotalFunds();
-        return "BA " + totalFunds;
+        try {
+            long totalFunds = accountService.getTotalFunds();
+            return "BA " + totalFunds;
+        } catch (Exception e) {
+            return "ER Unable to retrieve total funds in bank.";
+        }
     }
 }

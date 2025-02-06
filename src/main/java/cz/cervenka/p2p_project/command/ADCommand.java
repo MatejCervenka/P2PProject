@@ -3,13 +3,11 @@ package cz.cervenka.p2p_project.command;
 import cz.cervenka.p2p_project.network.NetworkClient;
 import cz.cervenka.p2p_project.server.P2PServer;
 import cz.cervenka.p2p_project.services.AccountService;
-import cz.cervenka.p2p_project.config.ApplicationConfig;
 
 import java.io.IOException;
 
 public class ADCommand implements Command {
     private final AccountService accountService;
-    private static final int PORT = ApplicationConfig.getInt("server.port");
 
     public ADCommand(AccountService accountService) {
         this.accountService = accountService;
@@ -35,7 +33,10 @@ public class ADCommand implements Command {
         }
 
         return accountService.deposit(accountNumber, depositAmount)
+                ? "AD" : "ER Failed to deposit money.";
+
+        /*return accountService.deposit(accountNumber, depositAmount)
                 ? "AD " + accountNumber + "/" + P2PServer.getBankCode() + " +" + depositAmount
-                : "ER Failed to deposit money.";
+                : "ER Failed to deposit money.";*/
     }
 }
