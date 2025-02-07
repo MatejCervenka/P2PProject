@@ -7,9 +7,12 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClientHandler implements Runnable {
 
+    private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
     private final Socket clientSocket;
     private final CommandProcessor commandProcessor;
     private static final int CLIENT_TIMEOUT = ApplicationConfig.getInt("client.readTimeout");
@@ -17,17 +20,19 @@ public class ClientHandler implements Runnable {
 
     private static final ExecutorService executor = Executors.newCachedThreadPool();
 
+    // ANSI escape codes for colors
+    private static final String RESET = "\u001B[0m";
+    private static final String RED = "\u001B[31m";
+    private static final String YELLOW = "\u001B[33m";
+
     public ClientHandler(Socket clientSocket, CommandProcessor commandProcessor) {
         this.clientSocket = clientSocket;
         this.commandProcessor = commandProcessor;
     }
 
-    /**
-     * Creates a thread for proper client handling process when client connects to server and operates on it at will.
-     */
     @Override
     public void run() {
-        System.out.println("Handling client: " + clientSocket.getInetAddress());
+        logger.info("Handling client: " + clientSocket.getInetAddress());
 
         try {
             clientSocket.setSoTimeout(CLIENT_TIMEOUT);
@@ -43,48 +48,40 @@ public class ClientHandler implements Runnable {
                         continue;
                     }
 
-                    System.out.println("Received: " + clientMessage);
+                    logger.info("Received: {}", clientMessage);
 
                     String response = processWithTimeout(clientMessage);
                     writer.println(response);
 
-                    System.out.println("Sent: " + response);
+                    logger.info("Sent: {}", response);
                 }
             }
         } catch (SocketTimeoutException e) {
-            System.err.println("Client connection timed out: " + e.getMessage());
+            logger.warn("{}Client connection timed out: {}{}", YELLOW, e.getMessage(), RESET);
         } catch (IOException e) {
-            System.err.println("Error handling client: " + e.getMessage());
+            logger.error("{}Error handling client: {}{}", RED, e.getMessage(), RESET);
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                System.err.println("Error closing client socket: " + e.getMessage());
+                logger.error("{}Error closing client socket: {}{}", RED, e.getMessage(), RESET);
             }
         }
     }
 
-    /**
-     * Reads input with a timeout to prevent clients from keeping the connection open indefinitely.
-     * @return Waits for at most the given time for the computation to complete, and then retrieves its result.
-     */
     private String readWithTimeout(BufferedReader reader) throws IOException {
         Future<String> future = executor.submit(reader::readLine);
 
         try {
             return future.get(CLIENT_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
-            System.err.println("Read operation timed out.");
+            logger.warn("{}Read operation timed out.{}", YELLOW, RESET);
             return null;
         } catch (Exception e) {
             throw new IOException("Error reading from client: " + e.getMessage());
         }
     }
 
-    /**
-     * Processes a command with a timeout to prevent long-running operations.
-     * @return Waits for at most the given time for the computation to complete, and then retrieves its result.
-     */
     private String processWithTimeout(String command) {
         Future<String> future = executor.submit(() -> commandProcessor.processCommand(command));
 
