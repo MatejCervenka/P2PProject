@@ -10,6 +10,10 @@ import java.util.concurrent.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handles client connections, processes commands, and manages timeouts.
+ * Each client connection is processed in a separate thread.
+ */
 public class ClientHandler implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(ClientHandler.class);
@@ -25,11 +29,21 @@ public class ClientHandler implements Runnable {
     private static final String RED = "\u001B[31m";
     private static final String YELLOW = "\u001B[33m";
 
+    /**
+     * Initializes the ClientHandler with the client socket and command processor.
+     *
+     * @param clientSocket The client socket to communicate with.
+     * @param commandProcessor The processor to handle client commands.
+     */
     public ClientHandler(Socket clientSocket, CommandProcessor commandProcessor) {
         this.clientSocket = clientSocket;
         this.commandProcessor = commandProcessor;
     }
 
+    /**
+     * Handles communication with the client.
+     * Reads client messages, processes them, and sends back responses.
+     */
     @Override
     public void run() {
         logger.info("Handling client: " + clientSocket.getInetAddress());
@@ -69,6 +83,13 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Reads a line from the client with a timeout.
+     *
+     * @param reader The BufferedReader to read the client's message.
+     * @return The message from the client, or null if a timeout occurs.
+     * @throws IOException If an I/O error occurs while reading.
+     */
     private String readWithTimeout(BufferedReader reader) throws IOException {
         Future<String> future = executor.submit(reader::readLine);
 
@@ -82,6 +103,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Processes a client command with a timeout.
+     *
+     * @param command The command to process.
+     * @return The response to the command.
+     */
     private String processWithTimeout(String command) {
         Future<String> future = executor.submit(() -> commandProcessor.processCommand(command));
 

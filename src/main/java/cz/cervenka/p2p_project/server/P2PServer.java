@@ -14,6 +14,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.*;
 
+/**
+ * A server for the P2P Banking system that listens for incoming client connections.
+ * It uses a thread pool to handle each client connection in a separate thread.
+ */
 public class P2PServer {
 
     private static final Logger logger = LoggerFactory.getLogger(P2PServer.class);
@@ -28,6 +32,9 @@ public class P2PServer {
     private static final String RED = "\u001B[31m";
     private static final String YELLOW = "\u001B[33m";
 
+    /**
+     * Initializes the P2PServer, setting up the thread pool and shutdown hook.
+     */
     public P2PServer() {
         this.threadPool = new ThreadPoolExecutor(
                 THREAD_POOL_SIZE, THREAD_POOL_SIZE,
@@ -40,6 +47,10 @@ public class P2PServer {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
     }
 
+    /**
+     * Starts the P2P Banking server, listening for client connections.
+     * Each client connection is handled in a separate thread.
+     */
     public void start() throws IOException {
         logger.info("P2P Banking Server is starting...");
         InetAddress localAddress = getLocalIpAddress();
@@ -70,6 +81,9 @@ public class P2PServer {
         }
     }
 
+    /**
+     * Shuts down the server and releases resources.
+     */
     private void shutdown() {
         logger.info("Shutting down server...");
 
@@ -88,6 +102,12 @@ public class P2PServer {
         logger.info("Server shut down.");
     }
 
+    /**
+     * Retrieves the local IP address for the server.
+     *
+     * @return The local IP address.
+     * @throws IOException If an error occurs while retrieving the IP address.
+     */
     private static InetAddress getLocalIpAddress() throws IOException {
         InetAddress localAddress = null;
 
@@ -101,10 +121,23 @@ public class P2PServer {
         return localAddress;
     }
 
+    /**
+     * Retrieves the bank code based on the local IP address.
+     *
+     * @return The bank's code (IP address).
+     * @throws IOException If an error occurs while retrieving the IP address.
+     */
     public static String getBankCode() throws IOException {
         return String.valueOf(getLocalIpAddress().getHostAddress());
     }
 
+    /**
+     * Validates if the given bank code matches the local bank code.
+     *
+     * @param bankCode The bank code to validate.
+     * @return true if the bank code is valid, false otherwise.
+     * @throws IOException If an error occurs while retrieving the bank code.
+     */
     public static boolean isValidBankCode(String bankCode) throws IOException {
         return getBankCode().equals(bankCode);
     }
