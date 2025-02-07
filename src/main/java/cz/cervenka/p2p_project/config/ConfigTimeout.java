@@ -2,8 +2,8 @@ package cz.cervenka.p2p_project.config;
 
 public class ConfigTimeout {
 
-    private static int commandTimeout = 5000;
-    private static int userTimeout = 30000;
+    private static int commandTimeout = ApplicationConfig.getInt("client.commandTimeout");
+    private static int userTimeout = ApplicationConfig.getInt("client.readTimeout");
 
     public static int getCommandTimeout() {
         return commandTimeout;

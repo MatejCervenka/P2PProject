@@ -17,7 +17,7 @@ public class CommandFactory {
         commands.put("AR", new ARCommand(accountService));
         commands.put("BA", new BACommand(accountService));
         commands.put("BN", new BNCommand(accountService));
-        commands.put("AS", new ASCommand(accountService));
+        //commands.put("AS", new ASCommand(accountService));
     }
 
     public Command getCommand(String commandName) {

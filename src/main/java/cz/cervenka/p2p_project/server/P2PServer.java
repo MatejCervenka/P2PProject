@@ -14,8 +14,8 @@ import java.util.concurrent.*;
 public class P2PServer {
 
     private static final int PORT = ApplicationConfig.getInt("server.port");
-    private static final int THREAD_POOL_SIZE = ApplicationConfig.getInt("threadpool.size");
-    private static final int MAX_QUEUE_SIZE = ApplicationConfig.getInt("threadpool.maxQueueSize");
+    private static final int THREAD_POOL_SIZE = ApplicationConfig.getInt("thread_pool.size");
+    private static final int MAX_QUEUE_SIZE = ApplicationConfig.getInt("thread_pool.maxQueueSize");
 
     private final ExecutorService threadPool;
 
@@ -46,7 +46,6 @@ public class P2PServer {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("New client connected: " + clientSocket.getInetAddress());
 
-                    // Execute ClientHandler tasks with thread pool
                     threadPool.execute(new ClientHandler(clientSocket, commandProcessor));
                 } catch (IOException e) {
                     System.err.println("Error accepting client connection: " + e.getMessage());
