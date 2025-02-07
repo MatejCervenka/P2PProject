@@ -22,6 +22,9 @@ public class ClientHandler implements Runnable {
         this.commandProcessor = commandProcessor;
     }
 
+    /**
+     * Creates a thread for proper client handling process when client connects to server and operates on it at will.
+     */
     @Override
     public void run() {
         System.out.println("Handling client: " + clientSocket.getInetAddress());
@@ -63,6 +66,7 @@ public class ClientHandler implements Runnable {
 
     /**
      * Reads input with a timeout to prevent clients from keeping the connection open indefinitely.
+     * @return Waits for at most the given time for the computation to complete, and then retrieves its result.
      */
     private String readWithTimeout(BufferedReader reader) throws IOException {
         Future<String> future = executor.submit(reader::readLine);
@@ -79,6 +83,7 @@ public class ClientHandler implements Runnable {
 
     /**
      * Processes a command with a timeout to prevent long-running operations.
+     * @return Waits for at most the given time for the computation to complete, and then retrieves its result.
      */
     private String processWithTimeout(String command) {
         Future<String> future = executor.submit(() -> commandProcessor.processCommand(command));

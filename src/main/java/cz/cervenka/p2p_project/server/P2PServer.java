@@ -28,6 +28,10 @@ public class P2PServer {
         );
     }
 
+    /**
+     * Operates the Peer-To-Peer server and handles client connection.
+     * @throws IOException If there's an error operating the server.
+     */
     public void start() throws IOException {
         System.out.println("P2P Banking Server is starting...");
         InetAddress localAddress = getLocalIpAddress();
@@ -58,6 +62,9 @@ public class P2PServer {
         }
     }
 
+    /**
+     * Shut-downs running server.
+     */
     private void shutdown() {
         System.out.println("Shutting down thread pool...");
         threadPool.shutdown();
@@ -67,20 +74,19 @@ public class P2PServer {
             }
         } catch (InterruptedException e) {
             threadPool.shutdownNow();
+        } finally {
+            System.out.println("Server shut down.");
         }
-        System.out.println("Server shut down.");
     }
 
     /**
      * Gets the local LAN IP address of the machine.
-     *
      * @return The LAN IP address or null if it cannot be determined.
      * @throws IOException If there's an error retrieving the LAN IP address.
      */
     private static InetAddress getLocalIpAddress() throws IOException {
         InetAddress localAddress = null;
 
-        // Attempt to get the LAN IP address (skipping localhost)
         for (InetAddress address : InetAddress.getAllByName(InetAddress.getLocalHost().getHostName())) {
             if (address.isSiteLocalAddress()) {
                 localAddress = address;

@@ -12,6 +12,9 @@ public class ApplicationConfig {
 
     private static final Properties properties = new Properties();
 
+    /*
+     * Retrieves and loads configuration file of application
+     */
     static {
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE)) {
             properties.load(fis);
@@ -20,10 +23,20 @@ public class ApplicationConfig {
         }
     }
 
+    /**
+     * Retrieves value of configuration file property based on given key.
+     * @param key Specific identifier of property in configuration file.
+     * @return Value of property in configuration file.
+     */
     public static String get(String key) {
         return properties.getProperty(key, "").trim();
     }
 
+    /**
+     * Retrieves value of configuration file property based on given key.
+     * @param key Specific identifier of property in configuration file.
+     * @return Integer value of property in configuration file.
+     */
     public static int getInt(String key) {
         String value = properties.getProperty(key);
         if (value == null) {
@@ -32,6 +45,10 @@ public class ApplicationConfig {
         return Integer.parseInt(value.trim());
     }
 
+    /**
+     * Sets value of host's ip address property in configuration file.
+     * @param ip Dynamically acquired IP Address from local computer.
+     */
     public static void setIP(String ip) {
         properties.setProperty("server.host.address", ip);
     }
