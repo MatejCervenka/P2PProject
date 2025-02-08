@@ -101,9 +101,3 @@ Ensure you have the following installed:
 | Account deposit          | AD   | AD  [account] / [ip] [balance]  | AD  [account] / [ip]  +[balance]               |
 | Account withdrawal       | AW   | AW  [account] / [ip] [balance]  | AW  [account] / [ip]  -[balance]               |
 | Account balance          | AB   | AB  [account] / [ip]            | AB  [balance]                                  |
-
-## Reused code
-- Active Record Database Pattern - [ActiveRecordDatabase - Entities Directory](https://github.com/MatejCervenka/ActiveRecordDatabase/tree/master/src/main/java/cz/cervenka/databaseproject/database/entities)
-
-## Links
-- 
