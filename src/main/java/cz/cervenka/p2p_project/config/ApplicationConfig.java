@@ -17,7 +17,8 @@ import java.util.Properties;
 public class ApplicationConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationConfig.class);
-    private static final String CONFIG_FILE = "src/main/resources/application.properties";
+    //private static final String CONFIG_FILE = "src/main/resources/application.properties";
+    private static final String CONFIG_FILE = "application.properties";
 
     //private static final String CONFIG_FILE = "application.properties";
     private static final Properties properties = new Properties();

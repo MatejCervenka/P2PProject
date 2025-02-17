@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
+
+import cz.cervenka.p2p_project.config.ApplicationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +20,7 @@ public class NetworkClient {
     private static final Logger logger = LoggerFactory.getLogger(NetworkClient.class);
     private static final int START_PORT = 65525;
     private static final int END_PORT = 65535;
-    private static final int CONNECTION_TIMEOUT_MS = 20000;
+    private static final int CONNECTION_TIMEOUT_MS = ApplicationConfig.getInt("remote_server.connectTimeout");
 
     // ANSI escape codes for colors
     private static final String RESET = "\u001B[0m";
