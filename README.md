@@ -37,6 +37,19 @@ The system uses a **MySQL** database with the following tables:
 
 ---
 
+## Testing
+
+- tested by peers and collaborators on a private network
+- issues with delay and/or firewall fixed
+- timing and/or timeouts set per network performance
+
+### Testers
+
+- [Daniel Linda](https://github.com/WMeindW)
+- [Jakub Hofman](https://github.com/Mithynite)
+
+---
+
 ## How to Run and Operate the Application
 
 ### 1. Prerequisites
