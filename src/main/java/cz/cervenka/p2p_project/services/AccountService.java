@@ -3,17 +3,16 @@ package cz.cervenka.p2p_project.services;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Class including methods operating with database system.
- */
 public class AccountService {
+    private static final ConcurrentHashMap<Integer, ReentrantLock> accountLocks = new ConcurrentHashMap<>();
 
     /**
-     * Creates account in bank.
-     * @return Byte value whether account was created or not.
+     * Creates an account in the bank.
+     * @return Account number if created, -1 if failed.
      */
     public int createAccount() {
         try {
@@ -21,6 +20,7 @@ public class AccountService {
             account.setAccountNumber(generateUniqueAccountNumber());
             account.setBalance(0L);
             account.save();
+            accountLocks.put(account.getAccountNumber(), new ReentrantLock()); // Add lock for new account
             return account.getAccountNumber();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -29,31 +29,37 @@ public class AccountService {
     }
 
     /**
-     * Deposits given amount of money into specific account.
-     * @param accountNumber Account where money is being deposited to.
-     * @param amount Amount of money being deposited.
-     * @return Byte value whether money was deposited or not.
+     * Deposits given amount of money into a specific account.
+     * @param accountNumber Account to deposit into.
+     * @param amount Amount to deposit.
+     * @return true if deposited successfully, false otherwise.
      */
     public boolean deposit(int accountNumber, Long amount) {
+        ReentrantLock lock = accountLocks.computeIfAbsent(accountNumber, k -> new ReentrantLock());
+        lock.lock();
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
             if (account != null) {
-                account.updateBalance(amount);
+                account.updateBalance(amount); // Database transaction handles atomic update
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
         return false;
     }
 
     /**
-     * Withdraws given amount of money from specific account.
-     * @param accountNumber Account where money is being withdrawn from.
-     * @param amount Amount of money being withdrawn.
-     * @return Byte value whether money was withdrawn or not.
+     * Withdraws given amount of money from a specific account.
+     * @param accountNumber Account to withdraw from.
+     * @param amount Amount to withdraw.
+     * @return true if withdrawn successfully, false otherwise.
      */
     public boolean withdraw(int accountNumber, Long amount) {
+        ReentrantLock lock = accountLocks.computeIfAbsent(accountNumber, k -> new ReentrantLock());
+        lock.lock();
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
             if (account != null && account.getBalance() >= amount) {
@@ -62,51 +68,48 @@ public class AccountService {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
         return false;
     }
 
     /**
-     * Retrieves a total balance of specific account.
-     * @param accountNumber Account from which balance is getting retrieved.
-     * @return Balance of specific account.
+     * Retrieves a total balance of a specific account.
+     * @param accountNumber Account number.
+     * @return Account balance or -1 if failed.
      */
     public Long getBalance(int accountNumber) {
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
-            if (account != null) {
-                return account.getBalance();
-            }
+            return (account != null) ? account.getBalance() : -1L;
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1L;
         }
-        return -1L;
     }
 
     /**
-     * Removes account from bank.
-     * @param accountNumber Account which is being removed.
-     * @return Byte value whether account was removed or not.
+     * Removes an account from the bank.
+     * @param accountNumber Account number.
+     * @return true if removed successfully, false otherwise.
      */
     public boolean removeAccount(int accountNumber) {
+        ReentrantLock lock = accountLocks.computeIfAbsent(accountNumber, k -> new ReentrantLock());
+        lock.lock();
         try {
             AccountEntity account = AccountEntity.findByAccountNumber(accountNumber);
             if (account != null && account.getBalance() == 0) {
                 account.delete();
+                accountLocks.remove(accountNumber); // Remove lock after deletion
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            lock.unlock();
         }
         return false;
-    }
-
-    /**
-     * Generates a random 5-digit number representing number of account.
-     * @return Random 5-digit number.
-     */
-    private int generateUniqueAccountNumber() {
-        return (int) (Math.random() * 90000) + 10000;
     }
 
     /**
@@ -114,16 +117,12 @@ public class AccountService {
      * @return The total balance of all accounts.
      */
     public Long getTotalFunds() {
-        Long totalFunds = 0L;
         try {
-            List<AccountEntity> allAccounts = AccountEntity.getAll();
-            for (AccountEntity account : allAccounts) {
-                totalFunds += account.getBalance();
-            }
+            return AccountEntity.getTotalBalance();
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1L;
         }
-        return totalFunds;
     }
 
     /**
@@ -131,27 +130,19 @@ public class AccountService {
      * @return The number of accounts.
      */
     public Long getTotalAccounts() {
-        long accountCount = 0L;
         try {
-            List<AccountEntity> allAccounts = AccountEntity.getAll();
-            accountCount = allAccounts.size();
+            return AccountEntity.getCount();
         } catch (SQLException e) {
             e.printStackTrace();
+            return -1L;
         }
-        return accountCount;
     }
 
     /**
-     * Retrieves all accounts in the system.
-     * @return The list of accounts.
+     * Generates a unique 5-digit account number.
+     * @return Unique 5-digit number.
      */
-    public List<AccountEntity> getAccounts() {
-        List<AccountEntity> allAccounts = new ArrayList<>();
-        try {
-            allAccounts = AccountEntity.getAll();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return allAccounts;
+    private int generateUniqueAccountNumber() {
+        return (int) (Math.random() * 90000) + 10000;
     }
 }
