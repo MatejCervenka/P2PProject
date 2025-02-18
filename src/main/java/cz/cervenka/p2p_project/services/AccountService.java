@@ -3,6 +3,7 @@ package cz.cervenka.p2p_project.services;
 import cz.cervenka.p2p_project.database.entities.AccountEntity;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -136,6 +137,20 @@ public class AccountService {
             e.printStackTrace();
             return -1L;
         }
+    }
+
+    /**
+     * Retrieves all accounts in the system.
+     * @return The list of accounts.
+     */
+    public List<AccountEntity> getAccounts() {
+        List<AccountEntity> allAccounts = new ArrayList<>();
+        try {
+            allAccounts = AccountEntity.getAll();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return allAccounts;
     }
 
     /**

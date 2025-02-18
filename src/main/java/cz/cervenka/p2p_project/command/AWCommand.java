@@ -54,8 +54,7 @@ public class AWCommand implements Command {
             }
 
             return accountService.withdraw(accountNumber, withdrawalAmount)
-                    ? "AW " + accountNumber + "/" + P2PServer.getBankCode() + " -" + withdrawalAmount
-                    : "ER Insufficient funds or invalid withdrawal.";
+                    ? "AW" : "ER Insufficient funds or invalid withdrawal.";
 
         } catch (NumberFormatException e) {
             return "ER Invalid number format. Account number and amount must be numeric.";
