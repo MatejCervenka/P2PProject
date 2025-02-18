@@ -47,6 +47,14 @@ The system uses a **MySQL** database with the following tables:
 
 - [Daniel Linda](https://github.com/WMeindW)
 - [Jakub Hofman](https://github.com/Mithynite)
+- [Tomáš Hůla](https://github.com/tomhula)
+
+### Issues
+| Name                     | Description                                                                                   | Expected                     | Issue                   | Resolved/Fix                 |
+|--------------------------|-----------------------------------------------------------------------------------------------|------------------------------|-------------------------|------------------------------|
+| Missing config file      | Could not run the application when configuration file wasn't present in directory             | Error message                | Crash                   | No                           |
+| Not compatible with different ports | Could not run the application when configuration file wasn't present in directory  | Error message                | Remote bank not found   | Yes                          |
+| School computers      | Trouble establishing connection between banks              | Error message                | Remote bank not found                   | Yes                           |
 
 ---
 
