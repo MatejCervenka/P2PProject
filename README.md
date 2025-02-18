@@ -95,10 +95,10 @@ Ensure you have the following installed:
 |--------------------------|------|---------------------------------|------------------------------------------------|
 | Bank code                | BC   | BC                              | BC  [ip]                                       |
 | Account create           | AC   | AC                              | AC  [account] / [ip]                           |
-| Account deposit          | AD   | AD  [account] / [ip] [balance]  | AD  [account] / [ip]  +[balance]               |
-| Account withdrawal       | AW   | AW  [account] / [ip] [balance]  | AW  [account] / [ip]  -[balance]               |
+| Account deposit          | AD   | AD  [account] / [ip] [balance]  | AD                 |
+| Account withdrawal       | AW   | AW  [account] / [ip] [balance]  | AW                 |
 | Account balance          | AB   | AB  [account] / [ip]            | AB  [balance]                                  |
-| Account remove           | AR   | AR  [account] / [ip]            | AR  [account] / [ip]   Removed                 |
+| Account remove           | AR   | AR  [account] / [ip]            | AR                 |
 | Account show             | AS   | AS                              | AS  [account] / [ip]    ||    [account] / [ip] |
 | Bank (total) amount      | BA   | BA                              | BA  [balance]                                  |
 | Bank number of clients   | BN   | BN                              | BN  [number]                                   |
@@ -119,6 +119,6 @@ Ensure you have the following installed:
 
 | Name                     | Code | Call                            | Response on success                            |
 |--------------------------|------|---------------------------------|------------------------------------------------|
-| Account deposit          | AD   | AD  [account] / [ip] [balance]  | AD  [account] / [ip]  +[balance]               |
-| Account withdrawal       | AW   | AW  [account] / [ip] [balance]  | AW  [account] / [ip]  -[balance]               |
+| Account deposit          | AD   | AD  [account] / [ip] [balance]  | AD                 |
+| Account withdrawal       | AW   | AW  [account] / [ip] [balance]  | AW                 |
 | Account balance          | AB   | AB  [account] / [ip]            | AB  [balance]                                  |
